@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+import csv
+import os
 
 def guardar_datos():
     datos = {
@@ -20,15 +22,24 @@ def guardar_datos():
     if videojuegos_var.get():
         datos["Acciones"].append("Videojuegos")
 
+    archivo_csv = "datos_formulario.csv"
+    escribir_encabezado = not os.path.isfile(archivo_csv)
+
     try:
-        with open("datos_usuario.txt", "a", encoding="utf-8") as f:
-            f.write("----- Nuevo registro -----\n")
-            for clave, valor in datos.items():
-                if isinstance(valor, list):
-                    f.write(f"{clave}: {', '.join(valor)}\n")
-                else:
-                    f.write(f"{clave}: {valor}\n")
-            f.write("\n")
+        with open(archivo_csv, "a", newline='', encoding="utf-8") as f:
+            writer = csv.writer(f)
+            if escribir_encabezado:
+                writer.writerow(datos.keys())
+            writer.writerow([
+                datos["Nombre"],
+                datos["A. Paterno"],
+                datos["A. Materno"],
+                datos["Correo"],
+                datos["Móvil"],
+                datos["Estado laboral"],
+                ', '.join(datos["Acciones"]),
+                datos["Estado"]
+            ])
         messagebox.showinfo("Guardado", "Los datos se guardaron correctamente.")
     except Exception as e:
         messagebox.showerror("Error", f"No se pudieron guardar los datos:\n{e}")
@@ -71,8 +82,13 @@ tk.Checkbutton(acciones_frame, text="Leer", variable=leer_var).pack(side="left")
 tk.Checkbutton(acciones_frame, text="Música", variable=musica_var).pack(side="left")
 tk.Checkbutton(acciones_frame, text="Videojuegos", variable=videojuegos_var).pack(side="left")
 
-estados_mexico = [ "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", "Chihuahua", "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México", "Guanajuato", "Guerrero", "Hidalgo", "Jalisco", "Michoacán", "Morelos", "Nayarit", "Nuevo León", "Oaxaca", "Puebla", "Querétaro", "Quintana Roo",
-"San Luis Potosí", "Sinaloa", "Sonora", "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"]
+estados_mexico = [
+    "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", "Chihuahua",
+    "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México", "Guanajuato", "Guerrero",
+    "Hidalgo", "Jalisco", "Michoacán", "Morelos", "Nayarit", "Nuevo León", "Oaxaca", "Puebla",
+    "Querétaro", "Quintana Roo", "San Luis Potosí", "Sinaloa", "Sonora", "Tabasco", "Tamaulipas",
+    "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
+]
 
 combo = ttk.Combobox(frame, values=estados_mexico)
 combo.set("Selecciona un estado")
